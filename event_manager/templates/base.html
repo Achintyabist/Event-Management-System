@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}Event Manager{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    /* Flash Message Centering and Positioning */
+    .flash-wrap {
+        /* Use flexbox to center the message horizontally on the page */
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .flash {
+        /* Limit the width of the message itself, ensuring it stays centered */
+        max-width: 600px;
+        padding: 10px 20px;
+        text-align: center;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    /* General Button Hover Fix: Ensure all primary buttons turn green on hover */
+    .btn:hover,
+    .btn-outline:hover {
+        background-color: #a3f7d3 !important; /* Soft green */
+        color: #003 !important; /* Dark text for contrast */
+        border-color: #a3f7d3 !important;
+    }
+
+    /* Custom style for btn-ghost (Logout/Leave) */
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-ghost:hover {
+      background-color: #a3f7d3; /* Soft green */
+      color: #003; /* Dark text */
+      border-color: #a3f7d3;
+    }
+    
+    /* Style for fading flash messages */
+    .flash-fading {
+      transition: opacity 1s ease-out;
+      opacity: 1;
+    }
+  </style>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="{{ url_for('index') }}" class="brand"><span class="logo-dot"></span> Event Manager</a>
+
+      <nav class="nav">
+        {% if session.get('user_type') %}
+          {% if session.get('user_name') %}
+            <span class="pill">{{ session.user_name }} ({{ session.user_type }})</span>
+          {% else %}
+            <span class="pill">Signed in: {{ session.user_type }}</span>
+          {% endif %}
+          <a class="btn-ghost" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a class="link" href="{{ url_for('organizer_signup') }}">Organizer</a>
+          <a class="link" href="{{ url_for('attendee_signup') }}">Attendee</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+        {% for cat, msg in messages %}
+          {% set display_msg = msg %}
+          {% if 'Logged in as' in msg %}
+              {% set display_msg = 'Login successful.' %}
+          {% elif 'Successfully registered for the session' in msg %}
+              {% set display_msg = 'Registered successfully.' %}
+          {% endif %}
+          
+          <div class="flash {{ cat }} flash-fading">{{ display_msg }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container">Powered by your Event Manager • Colors: Blue & Purple</div>
+  </footer>
+
+  <script>
+    // JavaScript for dynamic flash message fading (disappear after 3 seconds)
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashes = document.querySelectorAll('.flash-fading');
+        flashes.forEach(flash => {
+            // After 3 seconds, start fading out
+            setTimeout(() => {
+                flash.style.opacity = '0';
+                // Remove the element from the DOM after the fade is complete (1 second transition time)
+                setTimeout(() => {
+                    if (flash.parentNode) {
+                        flash.parentNode.removeChild(flash);
+                    }
+                }, 1000); 
+            }, 3000); // Wait 3 seconds
+        });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Sessions for {{ event.Event_Name }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('organizer_dashboard') }}" class="btn-ghost" style="margin-bottom: 20px;">&larr; Dashboard</a>
+
+<h2>Sessions for "{{ event.Event_Name }}"</h2>
+
+<form method="GET" action="{{ url_for('organizer_event', event_id=event.Event_Id) }}" class="filter-form">
+    <h3 style="margin-top: 0;">Filter Sessions</h3>
+
+    <input type="search" name="query" placeholder="Search session name" value="{{ request.args.get('query', '') }}" style="flex-grow: 1;">
+
+    <label for="session_status_filter">Status:</label>
+    <select name="session_status" id="session_status_filter">
+        <option value="">All Sessions</option>
+        <option value="not_filled" {% if request.args.get('session_status') == 'not_filled' %}selected{% endif %}>Not Filled</option>
+        <option value="filled" {% if request.args.get('session_status') == 'filled' %}selected{% endif %}>Filled/Full</option>
+    </select>
+
+    <button type="submit" class="btn-outline">Apply Filter</button>
+    {% if request.args.get('query') or request.args.get('session_status') %}
+         <a href="{{ url_for('organizer_event', event_id=event.Event_Id) }}" class="btn-ghost">Clear</a>
+    {% endif %}
+</form>
+
+<h3>Sessions / Schedule</h3>
+{% for s in schedules %}
+  <div class="session-card js-session-card" data-detail-url="{{ url_for('organizer_session_detail', schedule_id=s.Schedule_Id) }}">
+    <div>
+      <strong>{{ s.Session_Name }}</strong>
+      <div class="muted">{{ s.Session_Date }} • {{ s.Start_Time }} - {{ s.End_Time }}</div>
+    </div>
+    <div class="session-meta">
+      <div class="pill participants-pill">
+        Participants: {{ s.participants }} / {{ s.Capacity }}
+      </div>
+      <div class="pill seats-left-pill">
+        Seats Left: {{ s.seats_left }}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+<style>
+    /* Filter form styling for layout */
+    .filter-form { 
+        background: rgba(255, 255, 255, 0.05); 
+        padding: 15px; 
+        border-radius: 8px; 
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .filter-form h3 { margin: 0; font-size: 1.2em; }
+    .filter-form input[type="search"], .filter-form select {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+    /* Session card styles */
+    .session-card {
+        padding: 12px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .session-card:hover { background: rgba(255, 255, 255, 0.1); }
+    .session-meta { text-align: right; }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; background: rgba(0,0,0,0.2); margin-left: 5px; }
+</style>
+{% endblock %}

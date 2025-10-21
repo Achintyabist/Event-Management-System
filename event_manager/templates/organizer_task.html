@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task: {{ task.get('Task_Name') }} — Event Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reused Styles */
+    :root{--bg1:#6b7cff;--bg2:#8b4bff;--card:#e6fff0}
+    body{font-family:Poppins,system-ui,Arial;margin:0;min-height:100vh;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#fff}
+    .nav{padding:18px 36px;display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;align-items:center;font-weight:700}
+    .container{max-width:1000px;margin:28px auto;padding:28px;background:rgba(255,255,255,0.06);border-radius:12px}
+    h1{margin:0 0 12px;font-size:32px}
+    p.lead{opacity:0.95}
+    .meta{margin-top:8px;color:rgba(255,255,255,0.85); line-height: 1.6;}
+    .meta strong { color: #a3f7d3; font-weight: 600; margin-right: 4px; }
+    .section{margin-top:28px}
+    /* Tab Button Styles */
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff;text-decoration:none;margin-right:8px;cursor:pointer;transition:background-color 0.2s}
+    .btn.active{background:#a3f7d3;color:#003; border-color:#a3f7d3}
+    .content-section{display:none}
+    .content-section.active{display:block}
+    
+    /* New/Improved Card Styles */
+    .card-item{padding:15px;border-radius:10px;margin-bottom:12px;}
+    
+    /* Budget Item Card Styling */
+    .budget-item-card{background:rgba(163, 247, 211, 0.2); color: #fff;}
+    .budget-item-card strong {color: #a3f7d3; display: block; margin-bottom: 5px;} 
+    .budget-detail {margin-top: 5px;}
+    .budget-detail div {margin-bottom: 3px;}
+    .budget-actual-spent {color: red; font-weight: 600;} /* Red color for actual spent */
+
+    /* Vendor Card Styling */
+    .vendor-card{background:rgba(255, 255, 255, 0.1);}
+    .vendor-card h3 {margin: 0 0 5px; font-size: 1.2em;}
+    .vendor-card .detail {margin-bottom: 3px; font-size: 0.95em;}
+
+    footer{margin-top:40px;text-align:center;color:rgba(255,255,255,0.7)}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">●&nbsp;<strong>Event Manager</strong></div>
+    <div class="actions"> <span class="muted">Signed in: organizer</span> &nbsp; <a href="{{ url_for('logout') }}" class="btn">Logout</a></div>
+  </div>
+
+  <main class="container">
+    <header>
+      <h1>Task: {{ task.get('Task_Name') }}</h1>
+      <p class="lead">Event: {{ task.get('Event_Name') }}</p>
+      
+      <div class="meta">
+        <div><strong>Session:</strong> {{ task.get('Session_Name') }} ({{ task.get('Session_Date') }})</div>
+        <div><strong>Status:</strong> {{ task.get('Status') }}</div>
+        <div style="margin-top: 15px; font-size: 0.9em;">
+          <a href="{{ url_for('organizer_session_detail', schedule_id=task.get('Schedule_Id')) }}" style="color: #a3f7d3; text-decoration: none;">
+            &larr; Back to Session Details
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="section" id="tabs">
+      <button class="btn active" onclick="showSection('budget', this)">Budget</button>
+      <button class="btn" onclick="showSection('vendors', this)">Vendors</button>
+    </div>
+
+    <section id="budget" class="content-section active">
+  <h2>Budget Items</h2>
+  {% if budget_items %}
+    {% for b in budget_items %}
+      <div class="card-item budget-item-card">
+        <strong style="font-size: 1.1em;">{{ b.get('Name') }}</strong>
+        <p class="muted" style="margin: 0 0 8px;">Vendor: {{ b.get('Vendor_Name') }}</p>
+        <div class="budget-detail">
+          <div>Allocated Amount: <strong style="color: #a3f7d3;">₹{{ b.get('Allocated_Amount')|round(2) }}</strong></div>
+          <div class="budget-actual-spent">Actual Spent: ₹{{ b.get('Actual_Amount_Spent')|round(2) }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p><em>No budget items found for this task.</em></p>
+  {% endif %}
+</section>
+
+    <section id="vendors" class="content-section">
+      <h2>Associated Vendors</h2>
+      {% if vendors %}
+        {% for v in vendors %}
+          <div class="card-item vendor-card">
+            <h3>{{ v.get('Name') }}</h3>
+            <div class="detail muted">Service: {{ v.get('Service_Type') }}</div>
+            <div class="detail muted">Email: {{ v.get('Email') }}</div>
+            <div class="detail muted">Phone: {{ v.get('Phone_Number') }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p><em>No vendors associated with the budget items for this task.</em></p>
+      {% endif %}
+    </section>
+
+    <footer>
+      <p>Powered by your Event Manager • Colors: Blue & Purple</p>
+    </footer>
+  </main>
+  
+  <script>
+    // JavaScript for tab functionality (Reused logic)
+    function showSection(sectionId, clickedButton) {
+      // 1. Hide all content sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      // 2. Show the selected section
+      document.getElementById(sectionId).classList.add('active');
+      
+      // 3. Deactivate all buttons
+      document.querySelectorAll('#tabs .btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // 4. Activate the clicked button
+      clickedButton.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Attendee Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 30px;">
+    <a href="{{ url_for('attendee_events_list') }}" class="btn" style="margin-bottom: 20px;">Browse All Events</a>
+
+    <form method="GET" action="{{ url_for('attendee_dashboard') }}" class="filter-form">
+        <h3 style="margin-top: 0;">Filter Registered Sessions</h3>
+        
+        <input type="search" name="query" placeholder="Search by event or session name" value="{{ request.args.get('query', '') }}" style="flex-grow: 1;">
+
+        <button type="submit" class="btn-outline">Apply Search</button>
+        {% if request.args.get('query') %}
+             <a href="{{ url_for('attendee_dashboard') }}" class="btn-ghost">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<h2>Your Registered Sessions</h2>
+{% if registered_events %}
+  <div class="card-grid">
+    {% for event in registered_events %}
+      <div class="card small-card js-registered-card" data-url="{{ url_for('attendee_session_detail', schedule_id=event.Schedule_Id) }}">
+        
+        <h3>{{ event.name }}</h3>
+        <p class="session-name-display">{{ event.session_name }}</p>
+        
+        <p class="muted">Venue: {{ event.venue }}</p>
+        <p class="muted">Date: {{ event.date }} at {{ event.time }}</p>
+        
+        </div>
+    {% endfor %}
+  </div>
+{% else %}
+    {% if request.args.get('query') %}
+        <p>No registered sessions match your search query.</p>
+    {% else %}
+        <p>No registered sessions yet.</p>
+    {% endif %}
+{% endif %}
+
+<style>
+  /* Standard card-grid and small-card styles */
+  .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+  }
+  .small-card { 
+      height: auto; 
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer; /* Visual cue for clickability */
+      transition: transform 0.2s;
+  }
+  .small-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+  .session-name-display { font-weight: 600; color: #a3f7d3; margin-bottom: 8px; }
+
+  /* Filter form styling for dashboard */
+  .filter-form { 
+        background: rgba(255, 255, 255, 0.05); 
+        padding: 15px; 
+        border-radius: 8px; 
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .filter-form input[type="search"] {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+    .filter-form h3 { font-size: 1em; margin: 0; white-space: nowrap; }
+</style>
+
+<script>
+  // Unobtrusive JavaScript to handle clicks on the registered session cards
+  document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.js-registered-card');
+      
+      cards.forEach(card => {
+          card.addEventListener('click', (e) => {
+              // Ensure the click didn't land on a button or link (though none should exist now)
+              if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                  const url = card.getAttribute('data-url');
+                  if (url) {
+                      window.location.href = url;
+                  }
+              }
+          });
+      });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}All Events{% endblock %}
+{% block content %}
+
+<h2>All Events</h2>
+
+<form method="GET" action="{{ url_for('attendee_events_list') }}" class="filter-form" style="margin-bottom: 25px;">
+    <h3 style="margin-top: 0;">Search Events</h3>
+    
+    <input type="search" name="query" placeholder="Search by event name" value="{{ request.args.get('query', '') }}" style="flex-grow: 1;">
+
+    <button type="submit" class="btn-outline">Search</button>
+    {% if request.args.get('query') %}
+         <a href="{{ url_for('attendee_events_list') }}" class="btn-ghost">Clear</a>
+    {% endif %}
+</form>
+
+<div class="card-grid">
+{% for e in events %}
+  <div class="card js-event-card" data-detail-url="{{ url_for('attendee_event', event_id=e.Event_Id) }}">
+    <h3>{{ e.Event_Name }}</h3>
+    <p>{{ e.Event_Description|truncate(140) }}</p>
+    <a class="btn-outline" href="{{ url_for('attendee_event', event_id=e.Event_Id) }}">View sessions</a>
+  </div>
+{% endfor %}
+</div>
+
+<style>
+    /* Filter form styling for layout */
+    .filter-form { 
+        background: rgba(255, 255, 255, 0.05); 
+        padding: 15px; 
+        border-radius: 8px; 
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .filter-form h3 { font-size: 1em; margin: 0; white-space: nowrap; }
+    .filter-form input[type="search"] {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+    .js-event-card {
+        cursor: pointer;
+    }
+    .js-event-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    /* Note: card-grid styles should be defined globally or in the base template. */
+</style>
+{% endblock %}
