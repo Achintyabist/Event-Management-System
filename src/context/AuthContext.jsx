@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const response = await authService.login(credentials);
       setUser(response.user);
-      success('Login successful!');
+      // success('Login successful!');
       return response;
     } catch (err) {
       error(err.message || 'Login failed');
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await authService.signup(userData);
-      success('Account created successfully! Please login.');
+      // success('Account created successfully! Please login.');
       return response;
     } catch (err) {
       error(err.message || 'Signup failed');
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
-      success('Logged out successfully');
+      // success('Logged out successfully');
     } catch (err) {
       error('Logout failed');
     }
