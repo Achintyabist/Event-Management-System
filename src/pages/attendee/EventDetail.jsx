@@ -5,53 +5,42 @@ import { apiService } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 
-
 const EventDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
+
   const [event, setEvent] = useState(null);
+  const [schedules, setSchedules] = useState([]);
+  const [participants, setParticipants] = useState([]);
   const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [participants, setParticipants] = useState([]);
-  const [venue, setVenue] = useState(null);
-  const [organizer, setOrganizer] = useState(null);
 
-  // Fetch event details, participants, venue, organizer
   const fetchEventDetails = async () => {
     setLoading(true);
     try {
+      // Get event info
       const eventData = await apiService.getEventById(id);
       setEvent(eventData);
 
-      // Fetch participants
+      // Schedules
+      const scheduleData = await apiService.request(`/api/events/${id}/schedules`);
+      setSchedules(scheduleData || []);
+
+      // Participants (attendees)
       const attendeeData = await apiService.request(`/api/events/${id}/attendees`);
       setParticipants(attendeeData || []);
 
-      // Fetch venue info
-      if (eventData.venue_id || eventData.Venue_Id) {
-        const venueId = eventData.venue_id || eventData.Venue_Id;
-        const venues = await apiService.getVenues();
-        setVenue(venues.find(v => v.Venue_Id === venueId || v.id === venueId));
-      }
-
-      // Fetch organizer info
-      if (eventData.organizer_id || eventData.Organizer_Id) {
-        const organizerId = eventData.organizer_id || eventData.Organizer_Id;
-        setOrganizer({ Organizer_Id: organizerId });
-      }
-
-      // Check if user is registered
-      const registeredEvents = await apiService.getRegisteredEvents(user.Attendee_Id);
-      setRegistered((registeredEvents || []).some(e => (e.Event_Id || e.id) == id));
+      // Check registration
+      const regEvents = await apiService.getRegisteredEvents(user.Attendee_Id);
+      setRegistered((regEvents || []).some(e => (e.Event_Id || e.id) == id));
     } catch (err) {
-      // TODO: Show error toast if needed
+      console.log(err);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     fetchEventDetails();
-    // eslint-disable-next-line
   }, [id, user]);
 
   const handleRegister = async () => {
@@ -72,7 +61,7 @@ const EventDetail = () => {
     return (
       <AttendeeLayout>
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner size="lg" text="Loading event details..." />
+          <LoadingSpinner size="lg" text="Loading event..." />
         </div>
       </AttendeeLayout>
     );
@@ -81,30 +70,71 @@ const EventDetail = () => {
   return (
     <AttendeeLayout>
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow p-8 mt-8">
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">{event.event_name || event.Event_Name}</h2>
-        <p className="mb-2 text-gray-700">{event.event_description || event.Event_Description}</p>
-        <div className="mb-4 text-gray-600">
-          <span>Date: {event.event_date || event.Event_Date}</span><br/>
-          <span>Time: {event.event_time || event.Event_Time}</span><br/>
-          <span>Venue: {venue ? `${venue.Name || venue.name} (${venue.Location || venue.location})` : (event.venue_id || event.Venue_Id)}</span><br/>
-          <span>Organizer: {organizer ? organizer.Name || organizer.Organizer_Id : (event.organizer_id || event.Organizer_Id)}</span><br/>
-          <span>Participants: {participants.length}</span>
-        </div>
-        <div className="mt-6">
+
+        {/* EVENT HEADER */}
+        <h2 className="text-2xl font-bold mb-4 text-gray-900">
+          {event.Event_Name}
+        </h2>
+
+        <p className="mb-4 text-gray-700">
+          {event.Event_Description}
+        </p>
+
+        <p className="text-gray-600 mb-4">
+          Organizer ID: {event.Organizer_Id}
+        </p>
+
+        {/* REGISTER / UNREGISTER */}
+        <div className="mt-4 mb-8">
           {registered ? (
-            <button onClick={handleUnregister} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Unregister</button>
+            <button
+              onClick={handleUnregister}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Unregister
+            </button>
           ) : (
-            <button onClick={handleRegister} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Register</button>
+            <button
+              onClick={handleRegister}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Register
+            </button>
           )}
         </div>
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-2">Participants</h3>
-          <ul className="list-disc pl-6">
-            {participants.length > 0 ? participants.map(att => (
-              <li key={att.Attendee_Id || att.id}>{att.name} ({att.email})</li>
-            )) : <li>No participants yet.</li>}
-          </ul>
-        </div>
+
+        {/* SCHEDULES */}
+        <h3 className="text-xl font-semibold mt-6 mb-2">Schedules</h3>
+        <ul className="list-disc pl-6">
+          {schedules.length > 0 ? (
+            schedules.map(s => (
+              <li key={s.Schedule_Id} className="mb-2">
+                <strong>{s.Session_Name}</strong><br/>
+                Date: {s.Session_Date}<br/>
+                Time: {s.Start_Time} - {s.End_Time}<br/>
+                Venue: {s.Venue_Name} ({s.Venue_Location})<br/>
+                Organizer: {s.Session_Organizer}
+              </li>
+            ))
+          ) : (
+            <li>No schedules yet.</li>
+          )}
+        </ul>
+
+        {/* PARTICIPANTS */}
+        <h3 className="text-xl font-semibold mt-6 mb-2">Participants</h3>
+        <ul className="list-disc pl-6">
+          {participants.length > 0 ? (
+            participants.map(att => (
+              <li key={att.Attendee_Id}>
+                {att.Name} ({att.Email})
+              </li>
+            ))
+          ) : (
+            <li>No participants yet.</li>
+          )}
+        </ul>
+
       </div>
     </AttendeeLayout>
   );

@@ -62,7 +62,7 @@ const LoginForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900">
-          {userType === 'organizer' ? 'Organizer Login' : 'Attendee Login'}
+          {userType === 'Organizer' ? 'Organizer Login' : 'Attendee Login'}
         </h2>
         <p className="mt-2 text-gray-600">
           Sign in to your account
