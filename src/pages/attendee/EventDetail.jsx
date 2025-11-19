@@ -125,7 +125,7 @@ const EventDetail = () => {
               .map(s => (
                 <li key={s.Schedule_Id} className="mb-2">
                   <strong>{s.Session_Name}</strong><br />
-                  Date: {s.Session_Date}<br />
+                  Date: {s.Session_Date ? s.Session_Date.split('T')[0] : ''}<br />
                   Time: {s.Start_Time} - {s.End_Time}<br />
                   Venue: {s.Venue_Name} ({s.Venue_Location})<br />
                   Organizer: {s.Session_Organizer}

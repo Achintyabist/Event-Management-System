@@ -43,16 +43,16 @@ const EventDetail = () => {
 
   const handleDeleteSession = async (scheduleId) => {
     if (!window.confirm("Are you sure you want to delete this session?")) return;
-  
+
     await execute(async () => {
       await apiService.deleteSchedule(scheduleId);
-  
+
       // refresh schedules list
       const schedulesData = await apiService.request(`/api/events/${id}/schedules`);
       setSchedules(schedulesData || []);
     });
   };
-  
+
   return (
     <OrganizerLayout>
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-8 mt-8">
@@ -60,7 +60,7 @@ const EventDetail = () => {
         <h2 className="text-2xl font-bold mb-4 text-gray-900">
           {event.Event_Name}
         </h2>
-        
+
         <p className="mb-2 text-gray-700">{event.Event_Description}</p>
 
         <p className="text-gray-600 mb-6">
@@ -69,15 +69,15 @@ const EventDetail = () => {
 
         {/* SCHEDULES */}
         <div className="flex justify-between items-center mt-6 mb-2">
-  <h3 className="text-xl font-semibold">Schedules</h3>
+          <h3 className="text-xl font-semibold">Schedules</h3>
 
-  <Link
-    to={ROUTES.ORGANIZER_ADD_SESSION(event.Event_Id)}
-    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-  >
-    + Add Session
-  </Link>
-</div>
+          <Link
+            to={ROUTES.ORGANIZER_ADD_SESSION(event.Event_Id)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            + Add Session
+          </Link>
+        </div>
 
         <ul className="list-disc pl-6">
           {schedules.length > 0 ? (
@@ -86,7 +86,7 @@ const EventDetail = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <strong>{s.Session_Name}</strong><br />
-                    Date: {s.Session_Date}<br />
+                    Date: {s.Session_Date ? s.Session_Date.split('T')[0] : ''}<br />
                     Time: {s.Start_Time} - {s.End_Time}<br />
                     Venue: {s.Venue_Name} ({s.Venue_Location})
                   </div>
