@@ -8,6 +8,7 @@ router.post("/", (req, res) => {
 
   const {
     session_name,
+    session_organizer,
     session_date,
     start_time,
     end_time,
@@ -17,6 +18,7 @@ router.post("/", (req, res) => {
 
   if (
     !session_name ||
+    !session_organizer||
     !session_date ||
     !start_time ||
     !end_time ||
@@ -29,13 +31,13 @@ router.post("/", (req, res) => {
 
   const q = `
     INSERT INTO Schedule 
-    (Session_Name, Session_Date, Start_Time, End_Time, Venue_Id, Event_Id)
-    VALUES (?, ?, ?, ?, ?, ?)
+    (Session_Name, Session_Date, Start_Time, End_Time, Session_Organizer, Venue_Id, Event_Id)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
     q,
-    [session_name, session_date, start_time, end_time, venue_id, event_id],
+    [session_name, session_date, start_time, end_time, session_organizer, venue_id, event_id],
     (err, result) => {
       if (err) {
         console.log("❌ SQL ERROR:", err.sqlMessage);  // ⭐ LOG SQL ERROR

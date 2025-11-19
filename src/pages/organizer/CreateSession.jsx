@@ -14,6 +14,7 @@ const CreateSession = () => {
   const [form, setForm] = useState({
     session_name: "",
     session_date: "",
+    session_organizer: "",
     start_time: "",
     end_time: "",
     venue_id: ""
@@ -39,6 +40,7 @@ const CreateSession = () => {
 
     if (
       !form.session_name ||
+      !form.session_organizer||
       !form.session_date ||
       !form.start_time ||
       !form.end_time ||
@@ -52,6 +54,7 @@ const CreateSession = () => {
       try {
         await apiService.createSchedule({
           session_name: form.session_name,
+          session_organizer: form.session_organizer,
           session_date: form.session_date,
           start_time: form.start_time,
           end_time: form.end_time,
