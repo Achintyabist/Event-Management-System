@@ -158,36 +158,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Get Started?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join EventHub today and start creating amazing events that people will remember.
-          </p>
-          
-          {!isAuthenticated() && (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to={ROUTES.SIGNUP}
-                className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
-              >
-                Create Free Account
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <Link
-                to={ROUTES.LOGIN}
-                className="inline-flex items-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors"
-              >
-                Sign In
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
+      
     </Layout>
   );
 };
