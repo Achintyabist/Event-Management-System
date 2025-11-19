@@ -11,7 +11,8 @@ const EventDetail = () => {
 
   const [event, setEvent] = useState(null);
   const [schedules, setSchedules] = useState([]);
-  const [participants, setParticipants] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -26,9 +27,7 @@ const EventDetail = () => {
       const scheduleData = await apiService.request(`/api/events/${id}/schedules`);
       setSchedules(scheduleData || []);
 
-      // Participants (attendees)
-      const attendeeData = await apiService.request(`/api/events/${id}/attendees`);
-      setParticipants(attendeeData || []);
+
 
       // Check registration
       const regEvents = await apiService.getRegisteredEvents(user.Attendee_Id);
@@ -81,7 +80,7 @@ const EventDetail = () => {
         </p>
 
         <p className="text-gray-600 mb-4">
-          Organizer ID: {event.Organizer_Id}
+          Organizer: {event.Organizer_Name || event.Organizer_Id}
         </p>
 
         {/* REGISTER / UNREGISTER */}
@@ -105,33 +104,35 @@ const EventDetail = () => {
 
         {/* SCHEDULES */}
         <h3 className="text-xl font-semibold mt-6 mb-2">Schedules</h3>
-        <ul className="list-disc pl-6">
-          {schedules.length > 0 ? (
-            schedules.map(s => (
-              <li key={s.Schedule_Id} className="mb-2">
-                <strong>{s.Session_Name}</strong><br/>
-                Date: {s.Session_Date}<br/>
-                Time: {s.Start_Time} - {s.End_Time}<br/>
-                Venue: {s.Venue_Name} ({s.Venue_Location})<br/>
-                Organizer: {s.Session_Organizer}
-              </li>
-            ))
-          ) : (
-            <li>No schedules yet.</li>
-          )}
-        </ul>
 
-        {/* PARTICIPANTS */}
-        <h3 className="text-xl font-semibold mt-6 mb-2">Participants</h3>
+        {/* Search Bar */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search sessions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
         <ul className="list-disc pl-6">
-          {participants.length > 0 ? (
-            participants.map(att => (
-              <li key={att.Attendee_Id}>
-                {att.Name} ({att.Email})
-              </li>
-            ))
+          {schedules
+            .filter(s => s.Session_Name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .length > 0 ? (
+            schedules
+              .filter(s => s.Session_Name.toLowerCase().includes(searchTerm.toLowerCase()))
+              .map(s => (
+                <li key={s.Schedule_Id} className="mb-2">
+                  <strong>{s.Session_Name}</strong><br />
+                  Date: {s.Session_Date}<br />
+                  Time: {s.Start_Time} - {s.End_Time}<br />
+                  Venue: {s.Venue_Name} ({s.Venue_Location})<br />
+                  Organizer: {s.Session_Organizer}
+                </li>
+              ))
           ) : (
-            <li>No participants yet.</li>
+            <li>No schedules found.</li>
           )}
         </ul>
 

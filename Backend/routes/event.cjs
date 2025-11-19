@@ -77,7 +77,14 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   const eventId = req.params.id;
 
-  db.query("SELECT * FROM Event WHERE Event_Id = ?", [eventId], (err, results) => {
+  const q = `
+      SELECT e.*, o.Name AS Organizer_Name 
+      FROM Event e
+      LEFT JOIN Organizer o ON e.Organizer_Id = o.Organizer_Id
+      WHERE e.Event_Id = ?
+    `;
+
+  db.query(q, [eventId], (err, results) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
 
     if (results.length === 0) {
@@ -94,7 +101,7 @@ router.get("/:id/schedules", (req, res) => {
 
   const q = `
     SELECT s.Schedule_Id, s.Session_Name, s.Session_Date, 
-           s.Start_Time, s.End_Time, s.Venue_Id, 
+           s.Start_Time, s.End_Time, s.Venue_Id, s.Session_Organizer,
            v.Name AS Venue_Name, v.Location AS Venue_Location
     FROM Schedule s
     JOIN Venue v ON s.Venue_Id = v.Venue_Id
