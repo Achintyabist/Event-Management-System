@@ -21,10 +21,15 @@ const Events = () => {
     ]).then(([allEvents, regEvents]) => {
       // Only show required fields
       const filteredEvents = (allEvents || []).map(e => ({
-        event_id: e.Event_Id || e.event_id || e.id,
-        event_name: e.Event_Name || e.event_name || e.name,
-        event_description: e.Event_Description || e.event_description || e.description
+        Event_Id: e.Event_Id,
+        Event_Name: e.Event_Name,
+        Event_Description: e.Event_Description,
+        participants: e.participants || 0,
+        venue: e.Venue || null,
+        date: e.Event_Date || null,
+        time: e.Event_Time || null
       }));
+      
       setEvents(filteredEvents);
       setRegisteredEvents((regEvents || []).map(e => e.Event_Id || e.id));
       setLoading(false);
@@ -36,8 +41,8 @@ const Events = () => {
   };
 
   const filteredEvents = events.filter(event =>
-    (event.event_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (event.event_description || '').toLowerCase().includes(searchQuery.toLowerCase())
+    (event.Event_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (event.Event_Description || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleParticipate = async (eventId) => {
@@ -61,9 +66,9 @@ const Events = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map(event => {
-              const isRegistered = registeredEvents.includes(event.event_id);
+              const isRegistered = registeredEvents.includes(event.Event_Id);
               return (
-                <div key={event.event_id}>
+                <div key={event.Event_Id}>
                   <EventCard event={event} />
                   <div className="mt-2">
                     {isRegistered ? (
@@ -71,8 +76,8 @@ const Events = () => {
                         Registered
                       </button>
                     ) : (
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => handleParticipate(event.event_id)}>
-                        Participate / Register
+                      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => handleParticipate(event.Event_Id)}>
+                        Register
                       </button>
                     )}
                   </div>

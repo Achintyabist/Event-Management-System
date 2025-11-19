@@ -14,12 +14,18 @@ const EventCard = ({
 }) => {
   const { isOrganizer } = useAuth();
 
-  const getEventLink = () => {
-    if (isOrganizer()) {
-      return ROUTES.ORGANIZER_EVENT_DETAIL(event.Event_Id || event.id);
-    }
-    return ROUTES.ATTENDEE_EVENT_DETAIL(event.Event_Id || event.id);
-  };
+  const eventId =
+  event.Event_Id ||
+  event.event_id ||
+  event.id;
+
+const getEventLink = () => {
+  if (isOrganizer()) {
+    return ROUTES.ORGANIZER_EVENT_DETAIL(eventId);
+  }
+  return ROUTES.ATTENDEE_EVENT_DETAIL(eventId);
+};
+
 
   const handleEdit = (e) => {
     e.preventDefault();
