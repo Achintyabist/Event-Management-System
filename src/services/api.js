@@ -101,8 +101,8 @@ class ApiService {
     return this.request(`/api/events?type=registered&attendeeId=${attendeeId}`);
   }
 
-  async unregisterFromEvent(eventId) {
-    return this.request(`/api/registrations/${eventId}`, {
+  async unregisterFromEvent(eventId, attendeeId) {
+    return this.request(`/api/registrations/${eventId}?attendeeId=${attendeeId}`, {
       method: 'DELETE'
     });
   }

@@ -51,7 +51,7 @@ const EventDetail = () => {
 
   const handleUnregister = async () => {
     setLoading(true);
-    await apiService.unregisterFromEvent(id);
+    await apiService.unregisterFromEvent(id, user.Attendee_Id);
     await fetchEventDetails();
     setLoading(false);
   };

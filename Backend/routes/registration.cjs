@@ -19,4 +19,28 @@ router.post("/", (req, res) => {
   });
 });
 
+// DELETE /api/registrations/:id?attendeeId=...
+router.delete("/:id", (req, res) => {
+  const eventId = req.params.id;
+  const { attendeeId } = req.query;
+
+  if (!eventId || !attendeeId) {
+    return res.status(400).json({ error: "Missing eventId or attendeeId" });
+  }
+
+  // Delete registrations for this attendee for all schedules of the given event
+  const q = `
+    DELETE FROM Registrations 
+    WHERE Attendee_Id = ? 
+    AND Schedule_Id IN (
+      SELECT Schedule_Id FROM Schedule WHERE Event_Id = ?
+    )
+  `;
+
+  db.query(q, [attendeeId, eventId], (err, result) => {
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+    return res.json({ message: "Unregistered successfully" });
+  });
+});
+
 module.exports = router;
