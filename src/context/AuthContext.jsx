@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       // success('Login successful!');
       return response;
     } catch (err) {
-      error(err.message || 'Login failed');
+      // error(err.message || 'Login failed');
       throw err;
     } finally {
       setLoading(false);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       // success('Account created successfully! Please login.');
       return response;
     } catch (err) {
-      error(err.message || 'Signup failed');
+      // error(err.message || 'Signup failed');
       throw err;
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       // success('Logged out successfully');
     } catch (err) {
-      error('Logout failed');
+      // error('Logout failed');
     }
   };
 
