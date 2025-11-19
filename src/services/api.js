@@ -36,7 +36,8 @@ class ApiService {
       }
 
       if (!response.ok) {
-        throw new Error(data.message || data || `HTTP error! ${response.status}`);
+        const errorMessage = data.error || data.message || (typeof data === 'string' ? data : JSON.stringify(data)) || `HTTP error! ${response.status}`;
+        throw new Error(errorMessage);
       }
 
       return data;
