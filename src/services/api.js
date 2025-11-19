@@ -89,8 +89,9 @@ class ApiService {
     });
   }
 
-  async getEvents() {
-    return this.request('/api/events');
+  async getEvents(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/api/events?${queryString}`);
   }
 
   async getEventById(eventId) {

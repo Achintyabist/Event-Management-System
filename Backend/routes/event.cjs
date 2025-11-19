@@ -47,7 +47,8 @@ router.get("/", (req, res) => {
   }
 
   // ------------------- All Events -------------------
-  const q2 = `
+  // ------------------- All Events -------------------
+  let q2 = `
     SELECT 
       e.Event_Id,
       e.Event_Name,
@@ -60,8 +61,13 @@ router.get("/", (req, res) => {
         WHERE s.Event_Id = e.Event_Id
       ) AS participants
     FROM Event e
-    GROUP BY e.Event_Id;
   `;
+
+  if (req.query.hasSessions === 'true') {
+    q2 += ` WHERE EXISTS (SELECT 1 FROM Schedule s WHERE s.Event_Id = e.Event_Id) `;
+  }
+
+  q2 += ` GROUP BY e.Event_Id;`;
 
   db.query(q2, (err, results) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });

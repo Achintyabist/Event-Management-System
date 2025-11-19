@@ -16,7 +16,7 @@ const Events = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      apiService.getEvents(),
+      apiService.getEvents({ hasSessions: true }),
       user ? apiService.getRegisteredEvents(user.Attendee_Id) : Promise.resolve([])
     ]).then(([allEvents, regEvents]) => {
       // Only show required fields
@@ -29,7 +29,7 @@ const Events = () => {
         date: e.Event_Date || null,
         time: e.Event_Time || null
       }));
-      
+
       setEvents(filteredEvents);
       setRegisteredEvents((regEvents || []).map(e => e.Event_Id || e.id));
       setLoading(false);

@@ -18,7 +18,7 @@ router.post("/", (req, res) => {
 
   if (
     !session_name ||
-    !session_organizer||
+    !session_organizer ||
     !session_date ||
     !start_time ||
     !end_time ||
@@ -29,25 +29,39 @@ router.post("/", (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const q = `
-    INSERT INTO Schedule 
-    (Session_Name, Session_Date, Start_Time, End_Time, Session_Organizer, Venue_Id, Event_Id)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  db.query(
-    q,
-    [session_name, session_date, start_time, end_time, session_organizer, venue_id, event_id],
-    (err, result) => {
-      if (err) {
-        console.log("❌ SQL ERROR:", err.sqlMessage);  // ⭐ LOG SQL ERROR
-        return res.status(400).json({ error: err.sqlMessage });
-      }
-
-      console.log("✔ Session Created:", result.insertId);
-      res.json({ message: "Session created successfully", id: result.insertId });
+  // Check if Event exists first
+  db.query("SELECT Event_Id FROM Event WHERE Event_Id = ?", [event_id], (err, rows) => {
+    if (err) {
+      console.log("❌ SQL ERROR (Check Event):", err.sqlMessage);
+      return res.status(500).json({ error: err.sqlMessage });
     }
-  );
+
+    if (rows.length === 0) {
+      console.log("❌ Event Not Found:", event_id);
+      return res.status(404).json({ error: "Event not found. Cannot create session." });
+    }
+
+    // Proceed to insert
+    const q = `
+      INSERT INTO Schedule 
+      (Session_Name, Session_Date, Start_Time, End_Time, Session_Organizer, Venue_Id, Event_Id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+      q,
+      [session_name, session_date, start_time, end_time, session_organizer, venue_id, event_id],
+      (err, result) => {
+        if (err) {
+          console.log("❌ SQL ERROR (Insert Schedule):", err.sqlMessage);
+          return res.status(400).json({ error: err.sqlMessage });
+        }
+
+        console.log("✔ Session Created:", result.insertId);
+        res.json({ message: "Session created successfully", id: result.insertId });
+      }
+    );
+  });
 });
 
 

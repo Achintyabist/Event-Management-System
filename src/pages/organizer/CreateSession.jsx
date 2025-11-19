@@ -10,6 +10,12 @@ const CreateSession = () => {
   const { loading, execute } = useApi();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!eventId) {
+      setError("Invalid Event ID.");
+    }
+  }, [eventId]);
+
   const [venues, setVenues] = useState([]);
   const [form, setForm] = useState({
     session_name: "",
@@ -40,7 +46,7 @@ const CreateSession = () => {
 
     if (
       !form.session_name ||
-      !form.session_organizer||
+      !form.session_organizer ||
       !form.session_date ||
       !form.start_time ||
       !form.end_time ||
@@ -91,13 +97,13 @@ const CreateSession = () => {
           <div>
             <label className="block mb-1">Session Organizer</label>
             <input
-                type="text"
-                name="session_organizer"
-                value={form.session_organizer}
-                onChange={handleChange}
-                className="w-full border rounded p-2"
+              type="text"
+              name="session_organizer"
+              value={form.session_organizer}
+              onChange={handleChange}
+              className="w-full border rounded p-2"
             />
-            </div>
+          </div>
 
           <div>
             <label className="block mb-1">Date</label>

@@ -44,7 +44,7 @@ CREATE TABLE Event (
 
 
 CREATE TABLE Schedule (
-    Schedule_Id INT PRIMARY KEY ,
+    Schedule_Id INT PRIMARY KEY AUTO_INCREMENT,
     Event_Id INT NOT NULL,
     Session_Name VARCHAR(100) NOT NULL,
     Session_Date DATE NOT NULL,
