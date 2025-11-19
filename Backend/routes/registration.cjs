@@ -4,55 +4,57 @@ const router = express.Router();
 
 // POST /api/registrations
 router.post("/", (req, res) => {
-  const { attendee_id, event_id } = req.body;
+  const { attendee_id, event_id, schedule_id } = req.body;
 
-  if (!attendee_id || !event_id) {
-    return res.status(400).json({ error: "Missing attendee_id or event_id" });
+  if (!attendee_id) {
+    return res.status(400).json({ error: "Missing attendee_id" });
   }
 
-  // Step 1: find any schedule for this event
-  const findSchedule = `
-    SELECT Schedule_Id 
-    FROM Schedule 
-    WHERE Event_Id = ?
-    ORDER BY Session_Date ASC
-    LIMIT 1;
-  `;
-
-  db.query(findSchedule, [event_id], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage });
-
-    if (rows.length === 0) {
-      return res.status(400).json({ error: "No schedule found for this event" });
-    }
-
-    const schedule_id = rows[0].Schedule_Id;
-
-    // Step 2: register attendee for this schedule
+  // If schedule_id is provided, register directly
+  if (schedule_id) {
     const insert = `
       INSERT INTO Registrations (Attendee_Id, Schedule_Id, Registration_Date)
       VALUES (?, ?, CURDATE());
     `;
-
-    db.query(insert, [attendee_id, schedule_id], (err2, result) => {
-      if (err2) return res.status(400).json({ error: err2.sqlMessage });
-
+    db.query(insert, [attendee_id, schedule_id], (err, result) => {
+      if (err) return res.status(400).json({ error: err.sqlMessage });
       return res.json({
         message: "Registration successful",
         registration_id: result.insertId,
         schedule_id,
       });
     });
+    return;
+  }
+
+  // No schedule_id provided - event-level registration not supported
+  // Users must register for specific sessions
+  return res.status(400).json({
+    error: "schedule_id is required. Please register for specific sessions."
   });
 });
 
-// DELETE /api/registrations/:id?attendeeId=...
+// DELETE /api/registrations/:id?attendeeId=...&scheduleId=...
 router.delete("/:id", (req, res) => {
   const eventId = req.params.id;
-  const { attendeeId } = req.query;
+  const { attendeeId, scheduleId } = req.query;
 
   if (!eventId || !attendeeId) {
     return res.status(400).json({ error: "Missing eventId or attendeeId" });
+  }
+
+  // If scheduleId is provided, delete only that registration
+  if (scheduleId) {
+    const q = `
+      DELETE FROM Registrations 
+      WHERE Attendee_Id = ? 
+      AND Schedule_Id = ?
+    `;
+    db.query(q, [attendeeId, scheduleId], (err, result) => {
+      if (err) return res.status(500).json({ error: err.sqlMessage });
+      return res.json({ message: "Unregistered from session successfully" });
+    });
+    return;
   }
 
   // Delete registrations for this attendee for all schedules of the given event

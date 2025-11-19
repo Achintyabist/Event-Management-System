@@ -79,7 +79,6 @@ class ApiService {
 
   // ---------------- EVENTS ---------------- //
 
-  // ---------------- EVENTS ---------------- //
   async createEvent(eventData) {
     // Only send required fields (no event_id, it's auto-increment)
     const { event_name, event_description, organizer_id } = eventData;
@@ -102,9 +101,13 @@ class ApiService {
     return this.request(`/api/events?type=registered&attendeeId=${attendeeId}`);
   }
 
-  async unregisterFromEvent(eventId, attendeeId) {
-    return this.request(`/api/registrations/${eventId}?attendeeId=${attendeeId}`, {
-      method: 'DELETE'
+  async unregisterFromEvent(eventId, attendeeId, scheduleId = null) {
+    let url = `/api/registrations/${eventId}?attendeeId=${attendeeId}`;
+    if (scheduleId) {
+      url += `&scheduleId=${scheduleId}`;
+    }
+    return this.request(url, {
+      method: 'DELETE',
     });
   }
 
@@ -174,10 +177,10 @@ class ApiService {
   }
 
   // ---------------- REGISTRATION ---------------- //
-  async register(attendee_id, event_id) {
+  async register(attendee_id, event_id, schedule_id = null) {
     return this.request('/api/registrations', {
       method: 'POST',
-      body: JSON.stringify({ attendee_id, event_id }),
+      body: JSON.stringify({ attendee_id, event_id, schedule_id }),
     });
   }
 }

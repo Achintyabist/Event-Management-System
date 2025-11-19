@@ -88,7 +88,10 @@ const EventDetail = () => {
                     <strong>{s.Session_Name}</strong><br />
                     Date: {s.Session_Date ? s.Session_Date.split('T')[0] : ''}<br />
                     Time: {s.Start_Time} - {s.End_Time}<br />
-                    Venue: {s.Venue_Name} ({s.Venue_Location})
+                    Venue: {s.Venue_Name} ({s.Venue_Location})<br />
+                    <span className="text-blue-600 font-semibold mt-1 block">
+                      {s.registered_count} registered
+                    </span>
                   </div>
 
                   <button

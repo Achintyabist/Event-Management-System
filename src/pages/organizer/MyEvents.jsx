@@ -30,12 +30,16 @@ const MyEvents = () => {
   };
 
   const handleDelete = async (eventId) => {
+    if (!window.confirm("Are you sure you want to delete this event? This will also delete all associated schedules, tasks, and registrations.")) {
+      return;
+    }
+
     setLoading(true);
     try {
       await apiService.request(`/api/events/${eventId}`, { method: 'DELETE' });
       setEvents(events.filter(e => (e.Event_Id || e.id) !== eventId));
     } catch (err) {
-      // TODO: Show error toast if needed
+      alert(`Failed to delete event: ${err.message || 'Unknown error'}. The event may have associated schedules or tasks that need to be deleted first.`);
     }
     setLoading(false);
   };
@@ -51,9 +55,9 @@ const MyEvents = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map(event => (
-              <EventCard 
-                key={event.Event_Id || event.id} 
-                event={event} 
+              <EventCard
+                key={event.Event_Id || event.id}
+                event={event}
                 showActions={true}
                 onEdit={handleEdit}
                 onDelete={handleDelete}

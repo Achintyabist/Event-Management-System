@@ -13,7 +13,6 @@ const EventDetail = () => {
   const [schedules, setSchedules] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchEventDetails = async () => {
@@ -24,14 +23,9 @@ const EventDetail = () => {
       setEvent(eventData);
 
       // Schedules
-      const scheduleData = await apiService.request(`/api/events/${id}/schedules`);
+      const scheduleData = await apiService.request(`/api/events/${id}/schedules?attendeeId=${user.Attendee_Id}`);
       setSchedules(scheduleData || []);
 
-
-
-      // Check registration
-      const regEvents = await apiService.getRegisteredEvents(user.Attendee_Id);
-      setRegistered((regEvents || []).some(e => (e.Event_Id || e.id) == id));
     } catch (err) {
       console.log(err);
     }
@@ -42,17 +36,28 @@ const EventDetail = () => {
     fetchEventDetails();
   }, [id, user]);
 
-  const handleRegister = async () => {
+
+
+  const handleSessionRegister = async (scheduleId) => {
     setLoading(true);
-    await apiService.register(user.Attendee_Id, id);
-    await fetchEventDetails();
+    try {
+      await apiService.register(user.Attendee_Id, id, scheduleId);
+      await fetchEventDetails();
+    } catch (err) {
+      console.error(err);
+    }
     setLoading(false);
   };
 
-  const handleUnregister = async () => {
+  const handleSessionUnregister = async (scheduleId) => {
+    if (!window.confirm("Are you sure you want to unregister from this session?")) return;
     setLoading(true);
-    await apiService.unregisterFromEvent(id, user.Attendee_Id);
-    await fetchEventDetails();
+    try {
+      await apiService.unregisterFromEvent(id, user.Attendee_Id, scheduleId);
+      await fetchEventDetails();
+    } catch (err) {
+      console.error(err);
+    }
     setLoading(false);
   };
 
@@ -83,24 +88,8 @@ const EventDetail = () => {
           Organizer: {event.Organizer_Name || event.Organizer_Id}
         </p>
 
-        {/* REGISTER / UNREGISTER */}
-        <div className="mt-4 mb-8">
-          {registered ? (
-            <button
-              onClick={handleUnregister}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            >
-              Unregister
-            </button>
-          ) : (
-            <button
-              onClick={handleRegister}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Register
-            </button>
-          )}
-        </div>
+        {/* Registration is now session-based only - see schedules below */}
+
 
         {/* SCHEDULES */}
         <h3 className="text-xl font-semibold mt-6 mb-2">Schedules</h3>
@@ -116,19 +105,44 @@ const EventDetail = () => {
           />
         </div>
 
-        <ul className="list-disc pl-6">
+        <ul className="list-none pl-0">
           {schedules
             .filter(s => s.Session_Name.toLowerCase().includes(searchTerm.toLowerCase()))
             .length > 0 ? (
             schedules
               .filter(s => s.Session_Name.toLowerCase().includes(searchTerm.toLowerCase()))
               .map(s => (
-                <li key={s.Schedule_Id} className="mb-2">
-                  <strong>{s.Session_Name}</strong><br />
-                  Date: {s.Session_Date ? s.Session_Date.split('T')[0] : ''}<br />
-                  Time: {s.Start_Time} - {s.End_Time}<br />
-                  Venue: {s.Venue_Name} ({s.Venue_Location})<br />
-                  Organizer: {s.Session_Organizer}
+                <li key={s.Schedule_Id} className="mb-4 p-4 border rounded shadow-sm bg-gray-50">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <strong className="text-lg">{s.Session_Name}</strong><br />
+                      <span className="text-gray-600">Date:</span> {s.Session_Date ? s.Session_Date.split('T')[0] : ''}<br />
+                      <span className="text-gray-600">Time:</span> {s.Start_Time} - {s.End_Time}<br />
+                      <span className="text-gray-600">Venue:</span> {s.Venue_Name} ({s.Venue_Location})<br />
+                      <span className="text-gray-600">Organizer:</span> {s.Session_Organizer}<br />
+                      <span className="text-blue-600 font-semibold mt-1 block">
+                        {s.registered_count} registered
+                      </span>
+                    </div>
+
+                    <div>
+                      {s.is_registered ? (
+                        <button
+                          onClick={() => handleSessionUnregister(s.Schedule_Id)}
+                          className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold hover:bg-red-200"
+                        >
+                          Registered (Click to Unregister)
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleSessionRegister(s.Schedule_Id)}
+                          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                        >
+                          Register
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </li>
               ))
           ) : (

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AttendeeLayout from '../../components/layout/AttendeeLayout';
 import { apiService } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EventCard from '../../components/cards/EventCard';
 import SearchBar from '../../components/filters/SearchBar';
 import { useAuth } from '../../context/AuthContext';
+import { ROUTES } from '../../utils/constants';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -12,6 +14,7 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -45,13 +48,8 @@ const Events = () => {
     (event.Event_Description || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleParticipate = async (eventId) => {
-    setLoading(true);
-    await apiService.register(user.Attendee_Id, eventId);
-    // Refresh registered events
-    const regEvents = await apiService.getRegisteredEvents(user.Attendee_Id);
-    setRegisteredEvents((regEvents || []).map(e => e.Event_Id || e.id));
-    setLoading(false);
+  const handleViewDetails = (eventId) => {
+    navigate(ROUTES.ATTENDEE_EVENT_DETAIL(eventId));
   };
 
   return (
@@ -71,15 +69,12 @@ const Events = () => {
                 <div key={event.Event_Id}>
                   <EventCard event={event} />
                   <div className="mt-2">
-                    {isRegistered ? (
-                      <button className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed" disabled>
-                        Registered
-                      </button>
-                    ) : (
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => handleParticipate(event.Event_Id)}>
-                        Register
-                      </button>
-                    )}
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+                      onClick={() => handleViewDetails(event.Event_Id)}
+                    >
+                      {isRegistered ? 'View Details (Registered)' : 'View Details & Register'}
+                    </button>
                   </div>
                 </div>
               );

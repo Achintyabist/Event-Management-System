@@ -104,17 +104,27 @@ router.get("/:id", (req, res) => {
 // ------------------ GET SCHEDULES OF AN EVENT ------------------ //
 router.get("/:id/schedules", (req, res) => {
   const eventId = req.params.id;
+  const { attendeeId } = req.query;
 
   const q = `
-    SELECT s.Schedule_Id, s.Session_Name, s.Session_Date, 
-           s.Start_Time, s.End_Time, s.Venue_Id, s.Session_Organizer,
-           v.Name AS Venue_Name, v.Location AS Venue_Location
+    SELECT 
+      s.Schedule_Id, s.Session_Name, s.Session_Date, 
+      s.Start_Time, s.End_Time, s.Venue_Id, s.Session_Organizer,
+      v.Name AS Venue_Name, v.Location AS Venue_Location,
+      
+      (SELECT COUNT(*) FROM Registrations r WHERE r.Schedule_Id = s.Schedule_Id) AS registered_count,
+      
+      (SELECT COUNT(*) > 0 
+       FROM Registrations r 
+       WHERE r.Schedule_Id = s.Schedule_Id AND r.Attendee_Id = ?) AS is_registered
+
     FROM Schedule s
     JOIN Venue v ON s.Venue_Id = v.Venue_Id
     WHERE s.Event_Id = ?
   `;
 
-  db.query(q, [eventId], (err, results) => {
+  // Pass attendeeId (or null/0 if undefined) and eventId
+  db.query(q, [attendeeId || 0, eventId], (err, results) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
     return res.json(results);
   });
@@ -247,13 +257,52 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   const eventId = req.params.id;
 
-  db.query("DELETE FROM Event WHERE Event_Id = ?", [eventId], (err, result) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage });
+  // Step 1: Delete registrations for all schedules of this event
+  const deleteRegistrations = `
+    DELETE FROM Registrations 
+    WHERE Schedule_Id IN (
+      SELECT Schedule_Id FROM Schedule WHERE Event_Id = ?
+    )
+  `;
 
-    if (result.affectedRows === 0)
-      return res.status(404).json({ error: "Event not found" });
+  db.query(deleteRegistrations, [eventId], (err1) => {
+    if (err1) return res.status(500).json({ error: err1.sqlMessage });
 
-    return res.json({ message: "Event deleted successfully" });
+    // Step 2: Delete budget items for all tasks of this event
+    const deleteBudgetItems = `
+      DELETE FROM Budget_Items 
+      WHERE Task_Id IN (
+        SELECT Task_Id FROM Tasks WHERE Event_Id = ?
+      )
+    `;
+
+    db.query(deleteBudgetItems, [eventId], (err2) => {
+      if (err2) return res.status(500).json({ error: err2.sqlMessage });
+
+      // Step 3: Delete tasks for this event
+      const deleteTasks = `DELETE FROM Tasks WHERE Event_Id = ?`;
+
+      db.query(deleteTasks, [eventId], (err3) => {
+        if (err3) return res.status(500).json({ error: err3.sqlMessage });
+
+        // Step 4: Delete schedules for this event
+        const deleteSchedules = `DELETE FROM Schedule WHERE Event_Id = ?`;
+
+        db.query(deleteSchedules, [eventId], (err4) => {
+          if (err4) return res.status(500).json({ error: err4.sqlMessage });
+
+          // Step 5: Finally, delete the event itself
+          db.query("DELETE FROM Event WHERE Event_Id = ?", [eventId], (err5, result) => {
+            if (err5) return res.status(500).json({ error: err5.sqlMessage });
+
+            if (result.affectedRows === 0)
+              return res.status(404).json({ error: "Event not found" });
+
+            return res.json({ message: "Event and all related data deleted successfully" });
+          });
+        });
+      });
+    });
   });
 });
 
