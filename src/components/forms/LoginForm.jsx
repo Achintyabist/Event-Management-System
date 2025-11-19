@@ -62,8 +62,9 @@ const LoginForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900">
-          {userType === 'organizer' ? 'Organizer Login' : 'Attendee Login'}
+          {formData.userType === 'organizer' ? 'Organizer Login' : 'Attendee Login'}
         </h2>
+
         <p className="mt-2 text-gray-600">
           Sign in to your account
         </p>
@@ -79,22 +80,20 @@ const LoginForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
             <button
               type="button"
               onClick={() => setFormData(prev => ({ ...prev, userType: 'attendee' }))}
-              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
-                formData.userType === 'attendee'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-              }`}
+              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${formData.userType === 'attendee'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                }`}
             >
               Attendee
             </button>
             <button
               type="button"
               onClick={() => setFormData(prev => ({ ...prev, userType: 'organizer' }))}
-              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
-                formData.userType === 'organizer'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-              }`}
+              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${formData.userType === 'organizer'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                }`}
             >
               Organizer
             </button>
@@ -114,9 +113,8 @@ const LoginForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Enter your email"
             />
           </div>
@@ -138,9 +136,8 @@ const LoginForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.password ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Enter your password"
             />
             <button
