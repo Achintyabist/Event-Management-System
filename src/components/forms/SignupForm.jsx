@@ -59,7 +59,9 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
-    if (formData.phone && !validatePhone(formData.phone)) {
+    if (!validateRequired(formData.phone)) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!validatePhone(formData.phone)) {
       newErrors.phone = 'Please enter a valid phone number';
     }
 
@@ -103,22 +105,20 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
             <button
               type="button"
               onClick={() => setFormData(prev => ({ ...prev, userType: 'attendee' }))}
-              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
-                formData.userType === 'attendee'
+              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${formData.userType === 'attendee'
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-              }`}
+                }`}
             >
               Attendee
             </button>
             <button
               type="button"
               onClick={() => setFormData(prev => ({ ...prev, userType: 'organizer' }))}
-              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
-                formData.userType === 'organizer'
+              className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${formData.userType === 'organizer'
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-              }`}
+                }`}
             >
               Organizer
             </button>
@@ -138,9 +138,8 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Enter your full name"
             />
           </div>
@@ -162,9 +161,8 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Enter your email"
             />
           </div>
@@ -176,7 +174,7 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
         {/* Phone (Optional) */}
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number <span className="text-gray-400">(Optional)</span>
+            Phone Number
           </label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -186,9 +184,8 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.phone ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Enter your phone number"
             />
           </div>
@@ -210,9 +207,8 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.password ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Create a password"
             />
             <button
@@ -241,9 +237,8 @@ const SignupForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Confirm your password"
             />
             <button

@@ -4,6 +4,7 @@ const db = require("../db.cjs");
 
 // ---------------- ORGANIZER SIGNUP ----------------
 router.post("/organizer/signup", (req, res) => {
+    console.log("Organizer signup request body:", req.body);
     const { name, email, phone, password } = req.body;
 
     const q = `
@@ -12,7 +13,10 @@ router.post("/organizer/signup", (req, res) => {
     `;
 
     db.query(q, [name, email, phone, password], (err, result) => {
-        if (err) return res.status(400).json({ error: "Email already exists" });
+        if (err) {
+            console.error("Signup Error:", err);
+            return res.status(400).json({ error: err.message });
+        }
         res.json({ message: "Organizer signup successful" });
     });
 });
@@ -27,7 +31,10 @@ router.post("/attendee/signup", (req, res) => {
     `;
 
     db.query(q, [name, email, phone, password], (err, result) => {
-        if (err) return res.status(400).json({ error: "Email already exists" });
+        if (err) {
+            console.error("Signup Error:", err);
+            return res.status(400).json({ error: err.message });
+        }
         res.json({ message: "Attendee signup successful" });
     });
 });

@@ -36,13 +36,14 @@ router.get("/", (req, res) => {
       );
     `;
 
-    return db.query(q, [attendeeId], (err, results) => {
+    db.query(q, [attendeeId], (err, results) => {
       if (err) {
         console.error("Registered events SQL Error:", err.sqlMessage);
         return res.status(500).json({ error: err.sqlMessage });
       }
       return res.json(results);
     });
+    return;
   }
 
   // ------------------- All Events -------------------

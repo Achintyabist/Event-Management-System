@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS Event_Manager;
-USE Event_Manager;
+CREATE DATABASE IF NOT EXISTS Event_Manager_new;
+USE Event_Manager_new;
 CREATE TABLE Organizer (
     Organizer_Id INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(100) NOT NULL,
