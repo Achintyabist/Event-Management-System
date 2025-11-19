@@ -18,9 +18,9 @@ const Login = () => {
       await login(formData);
       // Redirect based on user type
       if (formData.userType === 'organizer') {
-        navigate(ROUTES.ORGANIZER_DASHBOARD);
+        navigate(ROUTES.ORGANIZER_EVENTS);
       } else {
-        navigate(ROUTES.ATTENDEE_DASHBOARD);
+        navigate(ROUTES.ATTENDEE_EVENTS);
       }
     } catch (error) {
       // Show error message

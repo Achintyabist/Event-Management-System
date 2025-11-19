@@ -62,11 +62,7 @@ const LoginForm = ({ onSubmit, loading = false, userType = 'attendee' }) => {
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900">
-<<<<<<< HEAD
-          {userType === 'Organizer' ? 'Organizer Login' : 'Attendee Login'}
-=======
           {formData.userType === 'organizer' ? 'Organizer Login' : 'Attendee Login'}
->>>>>>> bd640791bab9a97024ad8c519312e88e61d4949e
         </h2>
 
         <p className="mt-2 text-gray-600">

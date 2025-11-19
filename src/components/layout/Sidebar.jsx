@@ -8,13 +8,11 @@ const Sidebar = () => {
   const location = useLocation();
 
   const organizerLinks = [
-    { to: ROUTES.ORGANIZER_DASHBOARD, label: 'Dashboard' },
     { to: ROUTES.ORGANIZER_EVENTS, label: 'My Events' },
     { to: ROUTES.ORGANIZER_CREATE_EVENT, label: 'Create Event' },
     { to: '/organizer/profile', label: 'Profile' }
   ];
   const attendeeLinks = [
-    { to: ROUTES.ATTENDEE_DASHBOARD, label: 'Dashboard' },
     { to: ROUTES.ATTENDEE_EVENTS, label: 'Browse Events' },
     { to: ROUTES.ATTENDEE_MY_EVENTS, label: 'My Events' },
     { to: '/attendee/profile', label: 'Profile' }

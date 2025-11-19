@@ -10,10 +10,10 @@ const Home = () => {
 
   const getDashboardLink = () => {
     if (isOrganizer()) {
-      return ROUTES.ORGANIZER_DASHBOARD;
+      return ROUTES.ORGANIZER_EVENTS;
     }
     if (isAttendee()) {
-      return ROUTES.ATTENDEE_DASHBOARD;
+      return ROUTES.ATTENDEE_EVENTS;
     }
     return ROUTES.LOGIN;
   };

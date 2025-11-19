@@ -11,7 +11,6 @@ import { ROUTES } from "../../utils/constants";
 const EventDetail = () => {
   const { id } = useParams();
   const { loading, execute } = useApi();
-
   const [event, setEvent] = useState(null);
   const [schedules, setSchedules] = useState([]);
   const [attendees, setAttendees] = useState([]);

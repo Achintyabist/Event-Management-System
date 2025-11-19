@@ -25,10 +25,10 @@ const ProtectedRoute = ({ children, requireAuth = true }) => {
     // Redirect authenticated users to their dashboard based on role
     const { isOrganizer, isAttendee } = useAuth();
     if (isOrganizer()) {
-      return <Navigate to={ROUTES.ORGANIZER_DASHBOARD} replace />;
+      return <Navigate to={ROUTES.ORGANIZER_EVENTS} replace />;
     }
     if (isAttendee()) {
-      return <Navigate to={ROUTES.ATTENDEE_DASHBOARD} replace />;
+      return <Navigate to={ROUTES.ATTENDEE_EVENTS} replace />;
     }
     return <Navigate to={ROUTES.HOME} replace />;
   }

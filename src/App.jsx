@@ -14,7 +14,6 @@ import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 
 // Organizer Pages
-import OrganizerDashboard from './pages/organizer/Dashboard';
 import OrganizerMyEvents from './pages/organizer/MyEvents';
 import OrganizerProfile from './pages/organizer/Profile';
 import CreateEvent from './pages/organizer/CreateEvent';
@@ -24,7 +23,6 @@ import CreateSession from "./pages/organizer/CreateSession";
 
 
 // Attendee Pages
-import AttendeeDashboard from './pages/attendee/Dashboard';
 import AttendeeProfile from './pages/attendee/Profile';
 import Events from './pages/attendee/Events';
 import AttendeeMyEvents from './pages/attendee/MyEvents';
@@ -61,14 +59,6 @@ function App() {
             />
 
             {/* Organizer Routes */}
-            <Route 
-              path={ROUTES.ORGANIZER_DASHBOARD} 
-              element={
-                <OrganizerRoute>
-                  <OrganizerDashboard />
-                </OrganizerRoute>
-              } 
-            />
             <Route 
               path={ROUTES.ORGANIZER_EVENTS} 
               element={
@@ -118,14 +108,6 @@ function App() {
             />
 
             {/* Attendee Routes */}
-            <Route 
-              path={ROUTES.ATTENDEE_DASHBOARD} 
-              element={
-                <AttendeeRoute>
-                  <AttendeeDashboard />
-                </AttendeeRoute>
-              } 
-            />
             <Route 
               path={ROUTES.ATTENDEE_EVENTS} 
               element={
