@@ -11,11 +11,22 @@ const MyEvents = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    apiService.getRegisteredEvents(user.Attendee_Id).then(data => {
-      setEvents(data || []);
+    if (user?.Attendee_Id) {
+      setLoading(true);
+      apiService.getRegisteredEvents(user.Attendee_Id)
+        .then(data => {
+          setEvents(data || []);
+        })
+        .catch(err => {
+          console.error("Failed to fetch events", err);
+          setEvents([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
       setLoading(false);
-    });
+    }
   }, [user]);
 
   return (
@@ -25,7 +36,9 @@ const MyEvents = () => {
         {loading ? (
           <LoadingSpinner size="lg" text="Loading events..." />
         ) : events.length === 0 ? (
-          <div>No registered events found.</div>
+          <div className="text-gray-600 text-lg mt-8 text-center">
+            You are not participating in any event.
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map(event => (
