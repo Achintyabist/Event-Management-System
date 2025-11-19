@@ -142,6 +142,11 @@ class ApiService {
     return this.request('/api/schedules');
   }
 
+  async deleteSchedule(id) {
+    return this.request(`/api/schedules/${id}`, {
+      method: "DELETE",
+    });
+  }
   // ---------------- TASKS ---------------- //
   async createTask(taskData) {
     return this.request('/api/tasks', {

@@ -60,4 +60,22 @@ router.get("/", (req, res) => {
   });
 });
 
+// DELETE schedule
+
+// DELETE Schedule by ID
+router.delete("/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM Schedule WHERE Schedule_Id = ?", [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Schedule not found" });
+    }
+
+    return res.json({ message: "Schedule deleted successfully" });
+  });
+});
+
+
 module.exports = router;

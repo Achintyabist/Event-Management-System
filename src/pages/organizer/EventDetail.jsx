@@ -42,6 +42,18 @@ const EventDetail = () => {
     );
   }
 
+  const handleDeleteSession = async (scheduleId) => {
+    if (!window.confirm("Are you sure you want to delete this session?")) return;
+  
+    await execute(async () => {
+      await apiService.deleteSchedule(scheduleId);
+  
+      // refresh schedules list
+      const schedulesData = await apiService.request(`/api/events/${id}/schedules`);
+      setSchedules(schedulesData || []);
+    });
+  };
+  
   return (
     <OrganizerLayout>
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-8 mt-8">
@@ -72,11 +84,23 @@ const EventDetail = () => {
           {schedules.length > 0 ? (
             schedules.map((s) => (
               <li key={s.Schedule_Id} className="mb-2">
-                <strong>{s.Session_Name}</strong><br />
-                Date: {s.Session_Date}<br />
-                Time: {s.Start_Time} - {s.End_Time}<br />
-                Venue: {s.Venue_Name} ({s.Venue_Location})
+                <div className="flex justify-between items-start">
+                  <div>
+                    <strong>{s.Session_Name}</strong><br />
+                    Date: {s.Session_Date}<br />
+                    Time: {s.Start_Time} - {s.End_Time}<br />
+                    Venue: {s.Venue_Name} ({s.Venue_Location})
+                  </div>
+
+                  <button
+                    onClick={() => handleDeleteSession(s.Schedule_Id)}
+                    className="text-red-600 hover:text-red-800 ml-4"
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
+
             ))
           ) : (
             <li>No schedules yet.</li>
